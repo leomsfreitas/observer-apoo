@@ -27,13 +27,12 @@ public class Main {
                 auction.placeBid("Bruno", 2700.0);
             }
 
-            // Cada participante consulta o leilao no seu proprio intervalo
-            screen.check();               // toda rodada
+            screen.check();
             if (round % 2 == 0) {
-                notifier.check();         // a cada 2 rodadas
+                notifier.check();
             }
             if (round % 3 == 0) {
-                history.check();          // a cada 3 rodadas
+                history.check();
             }
         }
 
