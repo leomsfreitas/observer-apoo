@@ -4,20 +4,20 @@ public class Main {
 
     public static void main(String[] args) {
         WeatherSensor sensor = new WeatherSensor();
-        PhoneDisplay phone = new PhoneDisplay();
-        ThermostatDisplay thermostat = new ThermostatDisplay();
-        HeatAlert heatAlert = new HeatAlert();
+        Observer phone = new PhoneDisplay();
+        Observer thermostat = new ThermostatDisplay();
+        Observer heatAlert = new HeatAlert();
 
-        sensor.addPhoneDisplay(phone);
-        sensor.addThermostatDisplay(thermostat);
-        sensor.addHeatAlert(heatAlert);
+        sensor.subscribe(phone);
+        sensor.subscribe(thermostat);
+        sensor.subscribe(heatAlert);
 
         changeTemperature(sensor, 22.0);
         changeTemperature(sensor, 29.5);
         changeTemperature(sensor, 36.0);
 
         System.out.println("--- Removendo o celular ---");
-        sensor.removePhoneDisplay();
+        sensor.unsubscribe(phone);
 
         changeTemperature(sensor, 30.0);
     }
