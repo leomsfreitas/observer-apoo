@@ -4,7 +4,7 @@ Repositório de apoio da disciplina de **Análise e Projeto Orientado a Objetos 
 
 O conteúdo está dividido em duas partes:
 
-1. **Exemplo guiado (`weather`)**: uma estação meteorológica implementada primeiro sem o padrão Observer e, em seguida, refatorada com ele.
+1. **Exemplo guiado (`weather`)**: uma estação meteorológica implementada primeiro sem o padrão Observer e depois refatorada com ele. A versão refatorada está na `main`; a original fica na branch `feat/weather-monitoring-no-observer`.
 2. **Exercício prático (`auction`)**: um sistema de leilão baseado em polling, que deve ser refatorado pelos alunos para usar Observer.
 
 ## O padrão Observer
@@ -31,7 +31,9 @@ Benefícios esperados:
 
 ```
 src/
-  weather/                 Exemplo guiado: estação meteorológica
+  weather/                 Exemplo guiado: estação meteorológica (com Observer)
+    Subject.java
+    Observer.java
     WeatherSensor.java
     PhoneDisplay.java
     ThermostatDisplay.java
@@ -56,16 +58,38 @@ Um sensor de temperatura (`WeatherSensor`) precisa avisar três componentes semp
 
 ### Versão sem Observer
 
-A versão atual em `src/weather` resolve o problema de forma direta, e é justamente isso que ela pretende evidenciar:
+A primeira versão resolvia o problema de forma direta, e era justamente isso que ela pretendia evidenciar. O código está na branch `feat/weather-monitoring-no-observer`:
 
-- `WeatherSensor` tem um atributo para **cada tipo concreto** de componente e um par de métodos `add`/`remove` para cada um.
-- Adicionar um novo componente exige **alterar o `WeatherSensor`** (novo atributo, novos métodos e mais um `if` em `notifyDisplays`).
-- Só é possível ter **um componente de cada tipo**, já que cada referência é um campo simples.
-- O sensor está fortemente acoplado a todas as classes que dependem dele.
+```bash
+git checkout feat/weather-monitoring-no-observer
+```
+
+Problemas dessa versão:
+
+- `WeatherSensor` tinha um atributo para **cada tipo concreto** de componente e um par de métodos `add`/`remove` para cada um.
+- Adicionar um novo componente exigia **alterar o `WeatherSensor`** (novo atributo, novos métodos e mais um `if` em `notifyDisplays`).
+- Só era possível ter **um componente de cada tipo**, já que cada referência era um campo simples.
+- O sensor ficava fortemente acoplado a todas as classes que dependiam dele.
 
 ### Versão com Observer
 
-A versão refatorada introduz uma interface comum para os componentes e faz o `WeatherSensor` manter uma lista de observadores, eliminando os problemas listados acima. Ela será adicionada ao repositório em uma próxima etapa.
+A versão atual em `src/weather` aplica o padrão:
+
+| Classe | Papel |
+|---|---|
+| `Subject` | Interface com `subscribe`, `unsubscribe` e `notifyObservers`. |
+| `Observer` | Interface com `update(double temperature)`. |
+| `WeatherSensor` | Sujeito concreto: guarda uma `List<Observer>` e notifica todos em `setTemperature`. |
+| `PhoneDisplay`, `ThermostatDisplay`, `HeatAlert` | Observadores concretos: implementam `Observer` e reagem à nova temperatura. |
+
+Com isso, os problemas da versão anterior deixam de existir:
+
+- O `WeatherSensor` conhece apenas a interface `Observer`, nunca as classes concretas.
+- Um novo componente é só mais uma classe que implementa `Observer`, sem nenhuma alteração no sensor.
+- É possível registrar quantos observadores quiser, inclusive vários do mesmo tipo.
+- Observadores entram e saem em tempo de execução: o `Main` remove o `PhoneDisplay` no meio da execução, e ele deixa de receber as atualizações seguintes.
+
+O exemplo usa o **modelo push**: o sensor envia a temperatura como parâmetro de `update`, em vez de o observador consultar o sensor (**modelo pull**).
 
 ## Exercício prático: leilão
 
@@ -93,7 +117,7 @@ java -cp out auction.Main
 
 ## Sugestão de roteiro de estudo
 
-1. Rode o exemplo `weather` e leia o `WeatherSensor`. Liste o que precisaria mudar para adicionar um quarto componente.
-2. Compare com a versão com Observer e identifique quais desses pontos deixaram de existir.
+1. Na branch `feat/weather-monitoring-no-observer`, rode o exemplo `weather` e leia o `WeatherSensor`. Liste o que precisaria mudar para adicionar um quarto componente.
+2. Volte para a `main`, compare com a versão com Observer e identifique quais desses pontos deixaram de existir.
 3. Rode o exercício `auction`, responda às perguntas do enunciado e implemente a refatoração.
 4. Tente os desafios extras e discuta as variações do padrão (modelo push, em que o sujeito envia os dados ao observador, versus modelo pull, em que o observador consulta o sujeito).
