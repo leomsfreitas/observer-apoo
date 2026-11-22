@@ -1,51 +1,32 @@
 package weather;
 
-public class WeatherSensor {
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+public class WeatherSensor implements Subject {
+
+    private final List<Observer> observers = new CopyOnWriteArrayList<>();
     private double temperature;
-
-    private PhoneDisplay phoneDisplay;
-    private ThermostatDisplay thermostatDisplay;
-    private HeatAlert heatAlert;
 
     public void setTemperature(double temperature) {
         this.temperature = temperature;
-        notifyDisplays();
+        notifyObservers();
     }
 
-    public void addPhoneDisplay(PhoneDisplay phoneDisplay) {
-        this.phoneDisplay = phoneDisplay;
+    @Override
+    public void subscribe(Observer observer) {
+        observers.add(observer);
     }
 
-    public void removePhoneDisplay() {
-        this.phoneDisplay = null;
+    @Override
+    public void unsubscribe(Observer observer) {
+        observers.remove(observer);
     }
 
-    public void addThermostatDisplay(ThermostatDisplay thermostatDisplay) {
-        this.thermostatDisplay = thermostatDisplay;
-    }
-
-    public void removeThermostatDisplay() {
-        this.thermostatDisplay = null;
-    }
-
-    public void addHeatAlert(HeatAlert heatAlert) {
-        this.heatAlert = heatAlert;
-    }
-
-    public void removeHeatAlert() {
-        this.heatAlert = null;
-    }
-
-    private void notifyDisplays() {
-        if (phoneDisplay != null) {
-            phoneDisplay.update(temperature);
-        }
-        if (thermostatDisplay != null) {
-            thermostatDisplay.update(temperature);
-        }
-        if (heatAlert != null) {
-            heatAlert.update(temperature);
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(temperature);
         }
     }
 }
