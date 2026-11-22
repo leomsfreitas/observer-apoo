@@ -5,8 +5,7 @@ public class Main {
     public static void main(String[] args) {
         WeatherSensor sensor = new WeatherSensor();
         Observer phone = new PhoneDisplay();
-        Observer thermost
-        at = new ThermostatDisplay();
+        Observer thermostat = new ThermostatDisplay();
         Observer heatAlert = new HeatAlert();
 
         sensor.subscribe(phone);
